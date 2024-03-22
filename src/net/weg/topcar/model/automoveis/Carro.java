@@ -22,18 +22,7 @@ public class Carro extends Automovel {
 
     @Override
     public String toString() {
-        return "Carro {" +
-                "\nCódigo: " + this.getCODIGO() +
-                "\nModelo: " + this.getModelo() +
-                "\nAno: " + this.getAno() +
-                "\nMarca: " + this.getMarca() +
-                "\nTipo de combústivel: " + this.getTipoCombustivel() +
-                "\nPreço: " + this.getPreco() +
-                "\nQuilometragem: " + this.getQuilometragem() +
-                "\nPlaca: " + this.getPlaca() +
-                "\nCor: " + this.getCor() +
-                "\nStatus: " + (this.isComprado() ? "Comprado" : "À venda") +
-                "\nEstado: " + this.getEstado() +
+        return "Carro: \n" + super.toString() +
                 "\nMarcha: " + marcha +
                 "\nTipo da carroceria: " + tipoCarroceria + " }\n";
     }

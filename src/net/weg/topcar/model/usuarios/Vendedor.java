@@ -26,7 +26,7 @@ public class Vendedor extends Cliente implements IVendedor {
         return ("R$ " + (salario + comissoes));
     }
 
-    public Vendedor(String nome, Long cpf, String senha, Integer idade, Double salario) {
+    public Vendedor(String nome, Long cpf, String senha, Long idade, Double salario) {
         super(nome, cpf, senha, idade);
         this.salario = salario;
     }
@@ -42,5 +42,9 @@ public class Vendedor extends Cliente implements IVendedor {
         return super.toString() +
                 "\nSalário: R$ " + this.salario +
                 "\nComissões: R$ " + this.comissoes + " }\n";
+    }
+
+    protected String verPagamentoComNome() {
+        return this.getNome() + " : " + this.verPagamento();
     }
 }

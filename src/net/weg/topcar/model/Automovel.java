@@ -36,7 +36,7 @@ public abstract class Automovel {
         this.preco = preco;
     }
 
-    public void mudarStatus() {
+    public void mudarStatusDeCompra() {
         this.comprado = true;
     }
 
@@ -88,27 +88,19 @@ public abstract class Automovel {
         return estado;
     }
 
-    public static Automovel procurarAutomovel(String codigo ) {
-        for (Automovel automovel : listaAutomoveis) {
-            if (automovel.CODIGO.equals(codigo)) {
-                return automovel;
-            }
-        }
-
-        return null;
+    @Override
+    public String toString() {
+        return "Código: " + this.getCODIGO() +
+                "\nModelo: " + this.getModelo() +
+                "\nAno: " + this.getAno() +
+                "\nMarca: " + this.getMarca() +
+                "\nTipo de combústivel: " + this.getTipoCombustivel() +
+                "\nPreço: " + this.getPreco() +
+                "\nQuilometragem: " + this.getQuilometragem() +
+                "\nPlaca: " + this.getPlaca() +
+                "\nCor: " + this.getCor() +
+                "\nStatus: " + (this.isComprado() ? "Comprado" : "À venda") +
+                "\nEstado: " + this.getEstado() + " }\n";
     }
 
-    public void adicionarAutomovel() {
-        listaAutomoveis.add(this);
-    }
-
-    public void removerAutomovel() {
-        listaAutomoveis.remove(this);
-    }
-
-    public void editarAutomovel(Automovel novoAutomovel) {
-        listaAutomoveis.set(
-                listaAutomoveis.indexOf(this),
-                novoAutomovel);
-    }
 }

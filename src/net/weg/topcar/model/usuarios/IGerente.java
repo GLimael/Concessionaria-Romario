@@ -5,27 +5,37 @@ import net.weg.topcar.model.Automovel;
 import net.weg.topcar.model.exceptions.ObjetoNaoEncontradoException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface IGerente extends IVendedor {
-    void registrarAutomovel(
+    String registrarAutomovel(
             Automovel automovel, IBanco<Automovel, String> banco);
-    void removerAutomovel(
-            Automovel automovel, IBanco<Automovel, String> banco);
-    void editarAutomovel(
-            Automovel automovelAntigo, IBanco<Automovel, String> banco);
-    void editarPreco(
-            Automovel automovel,
-            double preco, IBanco<Automovel, String> banco);
-    void registrarUsuario(
-            Cliente cliente);
+
+    String removerAutomovel(
+            String id, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException;
+
+    String editarAutomovel(
+            Automovel automovel, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException;
+
+    String editarPreco(
+            String codigo,
+            double preco, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException;
+
+    String registrarUsuario(
+            Cliente cliente, IBanco<Cliente, Long> banco);
+
     String removerUsuario(
-            String cpf) throws ObjetoNaoEncontradoException;
+            Long cpf, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException;
+
     String editarUsuario(
-            Long cpf,
             Cliente novoCliente, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException;
-    ArrayList<Vendedor> verVendedores();
-    ArrayList<Cliente> verClientes();
-    ArrayList<String> verPagamentoVendedores();
+
+    List<Vendedor> verVendedores(IBanco<Cliente, Long> banco);
+
+    List<Cliente> verClientes(IBanco<Cliente, Long> banco);
+
+    ArrayList<String> verPagamentoVendedores(IBanco<Cliente, Long> banco);
+
     String verPagamentoVendedor(
-            Vendedor vendedor);
+            Long cpf, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException;
 }

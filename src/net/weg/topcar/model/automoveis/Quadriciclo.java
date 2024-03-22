@@ -9,17 +9,6 @@ public class Quadriciclo extends Automovel {
 
     @Override
     public String toString() {
-        return "Moto {" +
-                "\nCódigo: " + this.getCODIGO() +
-                "\nModelo: " + this.getModelo() +
-                "\nAno: " + this.getAno() +
-                "\nMarca: " + this.getMarca() +
-                "\nTipo de combústivel: " + this.getTipoCombustivel() +
-                "\nPreço: " + this.getPreco() +
-                "\nQuilometragem: " + this.getQuilometragem() +
-                "\nPlaca: " + this.getPlaca() +
-                "\nCor: " + this.getCor() +
-                "\nStatus: " + (this.isComprado() ? "Comprado" : "À venda") +
-                "\nEstado: " + this.getEstado() + " }\n";
+        return "Quadriciclo: \n" + super.toString();
     }
 }

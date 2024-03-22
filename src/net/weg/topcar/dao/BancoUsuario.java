@@ -15,14 +15,14 @@ public class BancoUsuario implements
                 listaClientes);
     }
 
-    public Cliente buscarUm(String cpf)
+    public Cliente buscarUm(Long cpf)
             throws ObjetoNaoEncontradoException {
         for (Cliente cliente : listaClientes) {
             if (cliente.getCpf().equals(cpf)) {
                 return cliente;
             }
         }
-        throw new ObjetoNaoEncontradoException(cpf);
+        throw new ObjetoNaoEncontradoException(cpf.toString());
     }
 
     public void adicionar(Cliente cliente) {

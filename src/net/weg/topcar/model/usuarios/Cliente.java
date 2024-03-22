@@ -12,10 +12,10 @@ public class Cliente implements ICliente{
     private String nome;
     private Long cpf;
     private String senha;
-    private int idade;
+    private Long idade;
     private ArrayList<Automovel> listaAutomoveis = new ArrayList<Automovel>();
 
-    public Cliente(String nome, Long cpf, String senha, Integer idade) {
+    public Cliente(String nome, Long cpf, String senha, Long idade) {
         this.nome = nome;
         this.cpf = cpf;
         this.senha = senha;
@@ -48,7 +48,7 @@ public class Cliente implements ICliente{
         return senha;
     }
 
-    public int getIdade() {
+    public Long getIdade() {
         return idade;
     }
 
@@ -58,7 +58,7 @@ public class Cliente implements ICliente{
 
     public void adicionarProprioAutomovel(Automovel automovel) {
         this.listaAutomoveis.add(automovel);
-        automovel.mudarStatus();
+        automovel.mudarStatusDeCompra();
     }
 
     @Override

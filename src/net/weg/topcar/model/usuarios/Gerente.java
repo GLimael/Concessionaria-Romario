@@ -5,8 +5,9 @@ import net.weg.topcar.model.Automovel;
 import net.weg.topcar.model.exceptions.ObjetoNaoEncontradoException;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Gerente extends Vendedor implements IGerente{
+public class Gerente extends Vendedor implements IGerente {
 
     public Gerente(String nome, Long cpf, String senha, Integer idade, Double salario) {
         super(nome, cpf, senha, idade, salario);
@@ -15,71 +16,95 @@ public class Gerente extends Vendedor implements IGerente{
     public String menu() {
         return super.menu() +
                 """
-                7 - Registrar automóvel;
-                8 - Remover automóvel;
-                9 - Editar automóvel;
-                10 - Editar preço;
-                11 - Registrar usuário;
-                12 - Remover usuário;
-                13 - Editar usuário;
-                14 - Ver vendedores;
-                15 - Ver clientes;
-                16 - Ver pagamentos dos vendedores;
-                17 - Ver pagamento de um vendedor;
-                """;
+                        7 - Registrar automóvel;
+                        8 - Remover automóvel;
+                        9 - Editar automóvel;
+                        10 - Editar preço;
+                        11 - Registrar usuário;
+                        12 - Remover usuário;
+                        13 - Editar usuário;
+                        14 - Ver vendedores;
+                        15 - Ver clientes;
+                        16 - Ver pagamentos dos vendedores;
+                        17 - Ver pagamento de um vendedor;
+                        """;
     }
 
     @Override
-    public String editarUsuario(Long cpf, Cliente clienteEditado, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException {
-        banco.alterar(cpf, clienteEditado);
+    public String editarUsuario(Cliente clienteEditado, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException {
+        banco.alterar(clienteEditado.getCpf(), clienteEditado);
         return "Usuário editado!";
     }
 
     @Override
-    public void venderAutomovel(Automovel automovel, Cliente cliente) {
-        cliente.adicionarProprioAutomovel(automovel);
-        this.comissoes += (automovel.getPreco() * 0.02);
+    public String registrarAutomovel(Automovel automovel, IBanco<Automovel, String> banco) {
+        banco.adicionar(automovel);
+        return "Automóvel registrado!";
     }
 
-    public void registrarAutomovel(Automovel automovel) {
-        automovel.adicionarAutomovel();
+    @Override
+    public String removerAutomovel(String codigo, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException {
+        banco.remover(codigo);
+        return "Automóvel removido!";
     }
 
-    public void removerAutomovel(Automovel automovel) {
-        automovel.removerAutomovel();
+
+    /***
+     * Método responsável por iniciar a ação de edição de um automóvel em nível de repositório (DAO)
+     * O parâmetro de automóvel recebe as informações editadas do automóvel, já o parâmetro de banco
+     * recebe qual o repositório manipula objetos do tipo Automóvel.
+     * O id do automóvel permanecerá o mesmo, por esse motivo é possível pegar o memsmo id presento no
+     * objeto editado.
+     * @param automovel
+     * @param banco
+     * @throws ObjetoNaoEncontradoException
+     */
+
+    @Override
+    public String editarAutomovel(Automovel automovel,
+                                IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException {
+        banco.alterar(automovel.getCODIGO(), automovel);
+        return "Veiculo editado!";
     }
 
-    public void editarAutomovel(Automovel automovelAntigo,
-                                Automovel automovelNovo) {
-        automovelAntigo.editarAutomovel(automovelNovo);
-    }
-
-    public void editarPreco(Automovel automovel, double preco) {
+    @Override
+    public String editarPreco(String codigo, double preco, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException {
+        Automovel automovel = banco.buscarUm(codigo);
         automovel.setPreco(preco);
+        banco.alterar(codigo, automovel);
+        return "Preço do veículo editado!";
     }
 
-    public void registrarUsuario(Cliente cliente) {
-        cliente.adicionarUsuario();
-    }
-
-    public String removerUsuario(String cpf) {
-        Cliente clienteRemover = Cliente.procurarUsuario(cpf);
-        if (clienteRemover == null) {
-            return ("Usuário não encontrado!");
-        } else if (clienteRemover instanceof Gerente) {
-            return ("O usuário pesquisado é um gerente! Impossível fazer a remoção!");
+    @Override
+    public String registrarUsuario(Cliente cliente, IBanco<Cliente, Long> banco) {
+        if (!(cliente instanceof Gerente)) {
+            banco.adicionar(cliente);
+            return "Usuário registrado!";
         }
-        clienteRemover.removerUsuario();
-        return ("Usuário removido!");
+        throw new RuntimeException("Ação não autorizada"); //Usar a classe de excessão que tinha que ser criada
+    }
+
+    @Override
+    public String removerUsuario(Long cpf, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException {
+        Cliente cliente = banco.buscarUm(cpf);
+        if (!(cliente instanceof Gerente)) {
+            banco.remover(cpf);
+            return "Usuário removido";
+        }
+        throw new RuntimeException("Ação não autorizada!");
     }
 
 //    public void editarUsuario(Cliente usuarioAntigo, Cliente usuarioNovo) {
 //        usuarioAntigo.editarUsuario(usuarioNovo);
 //    }
 
-    public ArrayList<Vendedor> verVendedores() {
-        ArrayList<Vendedor> listaVendedores = new ArrayList<Vendedor>();
-        for (Cliente cliente : getListaUsuarios()) {
+    @Override
+    public List<Vendedor> verVendedores(IBanco<Cliente, Long> banco) {
+//        List<Cliente> listaVendedores = banco.buscarTodos();
+//        listaVendedores.removeIf(cliente -> !(cliente instanceof Vendedor));
+        List<Cliente> listaClientes = banco.buscarTodos();
+        List<Vendedor> listaVendedores = new ArrayList<>();
+        for (Cliente cliente : listaClientes) {
             if (cliente instanceof Vendedor vendedor) {
                 listaVendedores.add(vendedor);
             }
@@ -87,39 +112,34 @@ public class Gerente extends Vendedor implements IGerente{
         return listaVendedores;
     }
 
-    public ArrayList<Cliente> verClientes() {
-        ArrayList<Cliente> listaClientes = new ArrayList<Cliente>();
-
-        for (Cliente cliente : getListaUsuarios()) {
-            if (cliente instanceof Cliente cliente) {
-                listaClientes.add(cliente);
-            }
-        }
-
-        return listaClientes;
+    @Override
+    public List<Cliente> verClientes(IBanco<Cliente, Long> banco) {
+        return banco.buscarTodos();
     }
 
-    public ArrayList<String> verPagamentoVendedores() {
+    @Override
+    public ArrayList<String> verPagamentoVendedores(IBanco<Cliente, Long> banco) {
         ArrayList<String> listaPagamentos = new ArrayList<String>();
 
-        for (Vendedor vendedor : verVendedores()) {
-            listaPagamentos.add(verPagamentoVendedor(vendedor));
+        for (Vendedor vendedor : verVendedores(banco)) {
+            listaPagamentos.add(vendedor.verPagamentoComNome());
         }
 
         return listaPagamentos;
     }
 
-    public String verPagamentoVendedor(Vendedor vendedor) {
-        return vendedor.getNome() + " : " + vendedor.verPagamento();
+    @Override
+    public String verPagamentoVendedor(Long cpf, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException {
+        Cliente cliente = banco.buscarUm(cpf);
+        if (cliente instanceof Vendedor vendedor) {
+            return vendedor.verPagamentoComNome();
+        }
+        throw new RuntimeException("O usuário informado não é um vendedor!");
     }
 
+    //Não precisaria, já que ele puxa somente o método da superclasse, deixando de ser necessário a escrira delee
     @Override
     public String toString() {
-        return "Gerente {" +
-                "\nNome: " + getNome() +
-                "\nCPF: " + getCpf() +
-                "\nIdade: " + getIdade() +
-                "\nSalário: R$ " + getSalario() +
-                "\nComissões: R$ " + getComissoes() + " }\n";
+        return super.toString();
     }
 }
