@@ -19,7 +19,7 @@ public interface IGerente extends IVendedor {
 
     String editarPreco(
             String codigo,
-            double preco, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException;
+            Double preco, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException;
 
     String registrarUsuario(
             Cliente cliente, IBanco<Cliente, Long> banco);

@@ -3,12 +3,12 @@ package net.weg.topcar.view;
 public class EntradaDecimal extends Entrada<Double>{
 
     @Override
-    protected boolean validaEntrada(Double leia) {
-        return false;
+    public Double leia() {
+        return sc.nextDouble();
     }
 
     @Override
-    public Double leia() {
-        return sc.nextDouble();
+    protected boolean validaEntrada(Double valor) {
+        return valor > 0.0;
     }
 }

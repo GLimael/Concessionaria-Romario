@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Gerente extends Vendedor implements IGerente {
 
-    public Gerente(String nome, Long cpf, String senha, Integer idade, Double salario) {
+    public Gerente(String nome, Long cpf, String senha, Long idade, Double salario) {
         super(nome, cpf, senha, idade, salario);
     }
 
@@ -68,7 +68,7 @@ public class Gerente extends Vendedor implements IGerente {
     }
 
     @Override
-    public String editarPreco(String codigo, double preco, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException {
+    public String editarPreco(String codigo, Double preco, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException {
         Automovel automovel = banco.buscarUm(codigo);
         automovel.setPreco(preco);
         banco.alterar(codigo, automovel);

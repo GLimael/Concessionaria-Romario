@@ -68,7 +68,7 @@ public class Cliente implements ICliente{
 
     @Override
     public List<Automovel> verMeusAutomoveis() {
-        return null;
+        return Collections.unmodifiableList(listaAutomoveis);
     }
 
     @Override
