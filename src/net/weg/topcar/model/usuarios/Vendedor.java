@@ -1,21 +1,36 @@
 package net.weg.topcar.model.usuarios;
 
 import net.weg.topcar.dao.IBanco;
-import net.weg.topcar.model.Automovel;
-import net.weg.topcar.model.exceptions.FalhaNaCompraException;
+import net.weg.topcar.model.automoveis.Automovel;
+import net.weg.topcar.model.exceptions.FalhaNaVendaException;
 import net.weg.topcar.model.exceptions.ObjetoNaoEncontradoException;
 
 public class Vendedor extends Cliente implements IVendedor {
-
     private Double salario;
     private Double comissoes;
 
+    public Vendedor(String nome, Long cpf, String senha, Long idade, Double salario) {
+        super(nome, cpf, senha, idade);
+        this.salario = salario;
+    }
+
+    @Override
     public String menu() {
         return super.menu() + """
                 4 - Vender automóvel;
                 5 - Procurar usuário;
                 6 - Ver pagamento;
                 """;
+    }
+
+    @Override
+    public void vender(Automovel automovel, Cliente cliente) throws FalhaNaVendaException {
+        if (!automovel.isComprado()) {
+            cliente.adicionarProprioAutomovel(automovel);
+            this.comissoes += (automovel.getPreco() * 0.01);
+        } else {
+            throw new FalhaNaVendaException("o automóvel já foi comprado!");
+        }
     }
 
     @Override
@@ -27,30 +42,15 @@ public class Vendedor extends Cliente implements IVendedor {
         return ("R$ " + (salario + comissoes));
     }
 
-    public Vendedor(String nome, Long cpf, String senha, Long idade, Double salario) {
-        super(nome, cpf, senha, idade);
-        this.salario = salario;
-    }
-
-    @Override
-    public void vender(Automovel automovel, Cliente cliente) throws FalhaNaCompraException{
-        if(!automovel.isComprado()) {
-            cliente.adicionarProprioAutomovel(automovel);
-            this.comissoes += ((automovel.getPreco() * 0.01));
-        } else {
-            throw new FalhaNaCompraException("O automóvel selecionado já foi comprado!");
-        }
+    protected String verPagamentoComNome() {
+        return this.getNome() + ": " + this.verPagamento();
     }
 
     @Override
     public String toString() {
         return super.toString() +
                 "\nSalário: R$ " + this.salario +
-                "\nComissões: R$ " + this.comissoes + " }\n";
-    }
-
-    protected String verPagamentoComNome() {
-        return this.getNome() + " : " + this.verPagamento();
+                "\nComissões: R$ " + this.comissoes;
     }
 
     public Double getSalario() {

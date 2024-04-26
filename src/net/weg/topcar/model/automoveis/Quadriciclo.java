@@ -1,14 +1,12 @@
 package net.weg.topcar.model.automoveis;
 
-import net.weg.topcar.model.Automovel;
-
 public class Quadriciclo extends Automovel {
-    public Quadriciclo(String CODIGO, String modelo, int ano, String marca, String tipoCombustivel, double preco, int quilometragem, String placa, String cor, String estado) {
-        super(CODIGO, modelo, ano, marca, tipoCombustivel, preco, quilometragem, placa, cor, estado);
+    public Quadriciclo(String CODIGO, String modelo, Long ano, String marca, String tipoCombustivel, Double preco, Double quilometragem, String placa, String cor, Boolean novo) {
+        super(CODIGO, modelo, ano, marca, tipoCombustivel, preco, quilometragem, placa, cor, novo);
     }
 
     @Override
     public String toString() {
-        return "Quadriciclo: \n" + super.toString();
+        return super.toString();
     }
 }

@@ -1,14 +1,14 @@
 package net.weg.topcar.model.usuarios;
 
 import net.weg.topcar.dao.IBanco;
-import net.weg.topcar.model.Automovel;
+import net.weg.topcar.model.automoveis.Automovel;
 import net.weg.topcar.model.exceptions.ObjetoNaoEncontradoException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Cliente implements ICliente{
+public class Cliente implements ICliente {
     private String nome;
     private Long cpf;
     private String senha;
@@ -29,12 +29,14 @@ public class Cliente implements ICliente{
 
     public String menu() {
         return """
-                                   
-                1 - Ver automóveis;
-                2 - Ver automóvel especifico;
-                3 - Ver seus automóveis;
-                """;
+                                         
+                    1 - Ver automóveis;
+                    2 - Ver automóvel especifico;
+                    3 - Ver seus automóveis;
+                    """;
     }
+
+
 
     public String getNome() {
         return nome;
@@ -52,23 +54,19 @@ public class Cliente implements ICliente{
         return idade;
     }
 
-    public List<Automovel> getListaAutomoveis() {
-        return Collections.unmodifiableList(listaAutomoveis);
-    }
-
     public void adicionarProprioAutomovel(Automovel automovel) {
         this.listaAutomoveis.add(automovel);
         automovel.mudarStatusDeCompra();
     }
 
     @Override
-    public List<Automovel> verAutomoveis(IBanco<Automovel, String> banco) {
-        return banco.buscarTodos();
+    public List<Automovel> verMeusAutomoveis() {
+        return Collections.unmodifiableList(listaAutomoveis);
     }
 
     @Override
-    public List<Automovel> verMeusAutomoveis() {
-        return Collections.unmodifiableList(listaAutomoveis);
+    public List<Automovel> verAutomoveis(IBanco<Automovel, String> banco) {
+        return banco.buscarTodos();
     }
 
     @Override
@@ -78,10 +76,8 @@ public class Cliente implements ICliente{
 
     @Override
     public String toString() {
-        return "Cliente{" +
-                "nome='" + nome + '\'' +
-                ", cpf=" + cpf +
-                ", idade=" + idade +
-                '}';
+        return  "\nNome: " + this.nome +
+                "\nCPF: " + this.cpf +
+                "\nIdade: " + this.idade;
     }
 }

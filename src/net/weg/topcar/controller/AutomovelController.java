@@ -1,34 +1,29 @@
 package net.weg.topcar.controller;
 
-import net.weg.topcar.dao.BancoAutomoveis;
-import net.weg.topcar.dao.BancoUsuario;
-import net.weg.topcar.dao.IBanco;
-import net.weg.topcar.model.Automovel;
+import net.weg.topcar.model.automoveis.Automovel;
+import net.weg.topcar.model.automoveis.Carro;
+import net.weg.topcar.model.automoveis.Moto;
+import net.weg.topcar.model.automoveis.Quadriciclo;
 import net.weg.topcar.model.exceptions.ObjetoNaoEncontradoException;
 import net.weg.topcar.model.exceptions.PermissaoNegadaException;
+import net.weg.topcar.model.exceptions.VeiculoExistenteException;
 import net.weg.topcar.model.usuarios.Cliente;
-import net.weg.topcar.model.usuarios.Gerente;
 import net.weg.topcar.model.usuarios.IGerente;
+import net.weg.topcar.service.AutomovelService;
 import net.weg.topcar.view.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AutomovelController {
-
     private static Cliente usuarioLogado;
+    private final AutomovelService automovelService;
 
-    private final IBanco<Cliente, Long> bancoUsuarios = new BancoUsuario();
-    private final IBanco<Automovel, String> bancoAutomoveis = new BancoAutomoveis();
-
-    private final Entrada<Long> entradaLong = new EntradaLong();
-    private final Entrada<String> entradaTexto = new EntradaTexto();
-    private final Entrada<Double> entradaDecimal = new EntradaDecimal();
-    private final Saida saida = new Saida();
+    public AutomovelController(AutomovelService automovelService) {
+        this.automovelService = automovelService;
+    }
 
     public void verAutomoveis() {
-        List<Automovel> listaAutomovel = bancoAutomoveis.buscarTodos();
-        List<Automovel> listaAutomoveisDisponiveis = filtrarAutomoveisDisponiveis(listaAutomovel);
+        List<Automovel> listaAutomoveisDisponiveis = automovelService.buscarAutomoveisDisponiveis();
         for (Automovel automovel : listaAutomoveisDisponiveis) {
             saida.escrevaL(automovel.toString());
         }
@@ -37,10 +32,89 @@ public class AutomovelController {
     public void verAutomovel() {
         try {
             String codigo = entradaCodigo();
-            Automovel automovel = bancoAutomoveis.buscarUm(codigo);
+            Automovel automovel = automovelService.buscarUm(codigo);
             saida.escrevaL(automovel.toString());
-        } catch (ObjetoNaoEncontradoException e) {
-            saida.escrevaL(e.getMessage());
+        } catch (ObjetoNaoEncontradoException exception) {
+            saida.escrevaL(exception.getMessage());
+        }
+    }
+
+    public void editarAutomovel() {
+        try {
+            isGerente();
+            String codigo = entradaCodigo();
+            Automovel automovel = automovelService.buscarUm(codigo);
+            String marca = entradaMarca(automovel.getMarca());
+            String modelo = entradaModelo(automovel.getModelo());
+            Long ano = entradaAno(automovel.getAno());
+            String tipoCombustivel = entradaCombustivel(automovel.getTipoCombustivel());
+            Double preco = entradaPreco(automovel.getPreco());
+            String cor = entradaCor(automovel.getCor());
+            Boolean novo = entradaNovo();
+            Double quilometragem = 0.0;
+            String placa = "";
+            if (!novo) {
+                quilometragem = entradaQuilometragem();
+                placa = entradaPlaca();
+            }
+            Automovel automovelEditado;
+            if (automovel instanceof Carro carro) {
+                String carroceria = entradaCarroceria(carro.getTipoCarroceria());
+                String marcha = entradaMarcha(carro.getMarcha());
+                automovelEditado =  new Carro(codigo, modelo, ano, marca, tipoCombustivel,
+                        preco, quilometragem, placa, cor, novo, marcha, carroceria);
+            } else if (automovel instanceof Moto moto) {
+                Long cilindradas = entradaCilindradas(moto.getCilindradas());
+                String partida = entradaPartida(moto.getPartida());
+                automovelEditado = new Moto(codigo, modelo, ano, marca, tipoCombustivel,
+                        preco, quilometragem, placa, cor, novo, partida, cilindradas);
+            } else {
+                automovelEditado = new Quadriciclo(codigo, modelo, ano, marca, tipoCombustivel,
+                        preco, quilometragem, placa, cor, novo);
+            }
+            automovelService.alterar(codigo, automovelEditado);
+        } catch (PermissaoNegadaException | ObjetoNaoEncontradoException exception) {
+            saida.escrevaL(exception.getMessage());
+        }
+
+    }
+
+    public void cadastroAutomovel() {
+        try {
+            isGerente();
+            String codigo = entradaCodigo();
+            String marca = entradaMarca();
+            String modelo = entradaModelo();
+            Long ano = entradaAno();
+            String tipoCombustivel = entradaCombustivel();
+            Double preco = entradaPreco();
+            String cor = entradaCor();
+            Boolean novo = entradaNovo();
+            Double quilometragem = 0.0;
+            String placa = "";
+            if (!novo) {
+                quilometragem = entradaQuilometragem();
+                placa = entradaPlaca();
+            }
+            Long tipo = selecionaTipoDeAutomovel();
+            Automovel novoAutomovel;
+            if (tipo == 1) {
+                String carroceria = entradaCarroceria();
+                String marcha = entradaMarcha();
+                novoAutomovel = new Carro(codigo, modelo, ano, marca, tipoCombustivel,
+                        preco, quilometragem, placa, cor, novo, marcha, carroceria);
+            } else if (tipo == 2) {
+                Long cilindradas = entradaCilindradas();
+                String partida = entradaPartida();
+                novoAutomovel = new Moto(codigo, modelo, ano, marca, tipoCombustivel,
+                        preco, quilometragem, placa, cor, novo, partida, cilindradas);
+            } else {
+                novoAutomovel = new Quadriciclo(codigo, modelo, ano, marca, tipoCombustivel,
+                        preco, quilometragem, placa, cor, novo);
+            }
+            automovelService.adicionar(novoAutomovel);
+        } catch (PermissaoNegadaException | VeiculoExistenteException exception) {
+            saida.escrevaL(exception.getMessage());
         }
     }
 
@@ -48,9 +122,9 @@ public class AutomovelController {
         try {
             isGerente();
             String codigo = entradaCodigo();
-            bancoAutomoveis.remover(codigo);
-        } catch (ObjetoNaoEncontradoException | PermissaoNegadaException e) {
-            saida.escrevaL(e.getMessage());
+            automovelService.remover(codigo);
+        } catch (ObjetoNaoEncontradoException | PermissaoNegadaException exception) {
+            saida.escrevaL(exception.getMessage());
         }
     }
 
@@ -58,69 +132,20 @@ public class AutomovelController {
         try {
             isGerente();
             String codigo = entradaCodigo();
-            Automovel automovel = bancoAutomoveis.buscarUm(codigo);
-            Double preco = entradaPreco(automovel.getPreco());
-            automovel.setPreco(preco);
-            bancoAutomoveis.alterar(codigo, automovel);
-        } catch (ObjetoNaoEncontradoException | PermissaoNegadaException e) {
-            saida.escrevaL(e.getMessage());
-        }
-    }
-
-    public void cadastroAutomovel() {
-        try {
-            isGerente();
-            String codigo = entradaCodigo();
-            validaCodigo(codigo);
-            String marca = entradaMarca();
-            String modelo = entradaModelo();
-            Long ano = entradaAno;
-            String tipoCombustivel = entradaCombustivel();
             Double preco = entradaPreco();
-            Double quilometragem = entradaQuilometragem();
-            String placa = entradaPlaca();
-            String cor = entradaCor();
-            Boolean novo = entradaNovo();
-        } catch (PermissaoNegadaException e) {
-
+            automovelService.alterarPreco(codigo, preco);
+        } catch (ObjetoNaoEncontradoException | PermissaoNegadaException exception) {
+            saida.escrevaL(exception.getMessage());
         }
     }
 
-    private void validaCodigo(String codigo) {
-        List<Automovel> listaAutomoveis = bancoAutomoveis.buscarTodos();
-        for (Automovel automovel: listaAutomoveis) {
-            if(!(codigo.equals(automovel.getCODIGO()))) {
-                
-            }
+    private void isGerente() throws PermissaoNegadaException {
+        if (!(usuarioLogado instanceof IGerente)) {
+            throw new PermissaoNegadaException("o usuário não é um gerente");
         }
     }
 
-    private Double entradaPreco(Double precoAntigo) {
-        Double novoPreco = entradaDecimal.leiaComSaida("Novo preço do automóvel: ", saida);
-        if (novoPreco <= 0) {
-            return precoAntigo;
-        }
-        return novoPreco;
-    }
 
-    private void isGerente() {
-        if (usuarioLogado instanceof IGerente) {
-            throw new PermissaoNegadaException("O usuário não é um gerente!");
-        }
+    public Automovel buscarAutomovel(String codigo) throws ObjetoNaoEncontradoException {
     }
-
-    private String entradaCodigo() {
-        return entradaTexto.leiaComSaidaEValidacao("Código do veículo: ", saida);
-    }
-
-    private List<Automovel> filtrarAutomoveisDisponiveis(List<Automovel> listaAutomoveis) {
-        List<Automovel> listaAutomoveisDisponiveis = new ArrayList<>();
-        for (Automovel automovel : listaAutomoveis) {
-            if (!automovel.isComprado()) {
-                listaAutomoveisDisponiveis.add(automovel);
-            }
-        }
-        return listaAutomoveisDisponiveis;
-    }
-
 }

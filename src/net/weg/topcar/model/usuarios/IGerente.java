@@ -1,41 +1,31 @@
 package net.weg.topcar.model.usuarios;
 
 import net.weg.topcar.dao.IBanco;
-import net.weg.topcar.model.Automovel;
-import net.weg.topcar.model.exceptions.ObjetoNaoEncontradoException;
+import net.weg.topcar.model.automoveis.Automovel;
+import net.weg.topcar.model.exceptions.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface IGerente extends IVendedor {
-    String registrarAutomovel(
-            Automovel automovel, IBanco<Automovel, String> banco);
+    String registrarAutomovel(Automovel automovel, IBanco<Automovel, String> banco);
 
-    String removerAutomovel(
-            String id, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException;
+    String removerAutomovel(String codigo, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException, PermissaoNegadaException;
 
-    String editarAutomovel(
-            Automovel automovel, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException;
+    String editarAutomovel(Automovel automovel, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException;
 
-    String editarPreco(
-            String codigo,
-            Double preco, IBanco<Automovel, String> banco) throws ObjetoNaoEncontradoException;
+    String editarPreco(String codigo, double preco, IBanco<Automovel, String> banco) throws PrecoInvalidoException, ObjetoNaoEncontradoException;
 
-    String registrarUsuario(
-            Cliente cliente, IBanco<Cliente, Long> banco);
+    String registrarUsuario(Cliente cliente, IBanco<Cliente, Long> banco) throws AcessoNegadoException;
 
-    String removerUsuario(
-            Long cpf, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException;
+    String removerUsuario(Long cpf, IBanco<Cliente, Long> banco) throws UsuarioNaoEncontradoException, PermissaoNegadaException, ObjetoNaoEncontradoException;
 
-    String editarUsuario(
-            Cliente novoCliente, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException;
+    String editarUsuario(Cliente usuarioNovo, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException;
 
     List<Vendedor> verVendedores(IBanco<Cliente, Long> banco);
 
     List<Cliente> verClientes(IBanco<Cliente, Long> banco);
 
-    ArrayList<String> verPagamentoVendedores(IBanco<Cliente, Long> banco);
+    List<String> verPagamentoVendedores(IBanco<Cliente, Long> banco);
 
-    String verPagamentoVendedor(
-            Long cpf, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException;
+    String verPagamentoVendedor(Long cpf, IBanco<Cliente, Long> banco) throws ObjetoNaoEncontradoException;
 }
