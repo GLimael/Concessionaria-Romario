@@ -15,28 +15,22 @@ import net.weg.topcar.view.*;
 import java.util.List;
 
 public class AutomovelController {
-    private static Cliente usuarioLogado;
     private final AutomovelService automovelService;
+
+    protected void cadastroAutomovel(Automovel automovel) throws VeiculoExistenteException {
+        automovelService.adicionar(automovel);
+    }
 
     public AutomovelController(AutomovelService automovelService) {
         this.automovelService = automovelService;
     }
 
-    public void verAutomoveis() {
-        List<Automovel> listaAutomoveisDisponiveis = automovelService.buscarAutomoveisDisponiveis();
-        for (Automovel automovel : listaAutomoveisDisponiveis) {
-            saida.escrevaL(automovel.toString());
-        }
+    public List<Automovel> buscarAutomoveis() {
+        return automovelService.buscarAutomoveisDisponiveis();
     }
 
-    public void verAutomovel() {
-        try {
-            String codigo = entradaCodigo();
-            Automovel automovel = automovelService.buscarUm(codigo);
-            saida.escrevaL(automovel.toString());
-        } catch (ObjetoNaoEncontradoException exception) {
-            saida.escrevaL(exception.getMessage());
-        }
+    public Automovel buscarAutomovel(String codigo) throws ObjetoNaoEncontradoException {
+        return automovelService.buscarUm(codigo);
     }
 
     public void editarAutomovel() {
@@ -79,73 +73,21 @@ public class AutomovelController {
 
     }
 
-    public void cadastroAutomovel() {
-        try {
-            isGerente();
-            String codigo = entradaCodigo();
-            String marca = entradaMarca();
-            String modelo = entradaModelo();
-            Long ano = entradaAno();
-            String tipoCombustivel = entradaCombustivel();
-            Double preco = entradaPreco();
-            String cor = entradaCor();
-            Boolean novo = entradaNovo();
-            Double quilometragem = 0.0;
-            String placa = "";
-            if (!novo) {
-                quilometragem = entradaQuilometragem();
-                placa = entradaPlaca();
-            }
-            Long tipo = selecionaTipoDeAutomovel();
-            Automovel novoAutomovel;
-            if (tipo == 1) {
-                String carroceria = entradaCarroceria();
-                String marcha = entradaMarcha();
-                novoAutomovel = new Carro(codigo, modelo, ano, marca, tipoCombustivel,
-                        preco, quilometragem, placa, cor, novo, marcha, carroceria);
-            } else if (tipo == 2) {
-                Long cilindradas = entradaCilindradas();
-                String partida = entradaPartida();
-                novoAutomovel = new Moto(codigo, modelo, ano, marca, tipoCombustivel,
-                        preco, quilometragem, placa, cor, novo, partida, cilindradas);
-            } else {
-                novoAutomovel = new Quadriciclo(codigo, modelo, ano, marca, tipoCombustivel,
-                        preco, quilometragem, placa, cor, novo);
-            }
-            automovelService.adicionar(novoAutomovel);
-        } catch (PermissaoNegadaException | VeiculoExistenteException exception) {
-            saida.escrevaL(exception.getMessage());
-        }
+
+
+    public void removerAutomovel(String codigo) throws ObjetoNaoEncontradoException, PermissaoNegadaException {
+        isGerente();
+        automovelService.remover(codigo);
     }
 
-    public void removerAutomovel() {
-        try {
-            isGerente();
-            String codigo = entradaCodigo();
-            automovelService.remover(codigo);
-        } catch (ObjetoNaoEncontradoException | PermissaoNegadaException exception) {
-            saida.escrevaL(exception.getMessage());
-        }
+    public void alterarPreco(String codigo, Double preco) throws PermissaoNegadaException, ObjetoNaoEncontradoException {
+        isGerente();
+        automovelService.alterarPreco(codigo, preco);
     }
 
-    public void alterarPreco() {
-        try {
-            isGerente();
-            String codigo = entradaCodigo();
-            Double preco = entradaPreco();
-            automovelService.alterarPreco(codigo, preco);
-        } catch (ObjetoNaoEncontradoException | PermissaoNegadaException exception) {
-            saida.escrevaL(exception.getMessage());
-        }
-    }
-
-    private void isGerente() throws PermissaoNegadaException {
+    protected void isGerente() throws PermissaoNegadaException {
         if (!(usuarioLogado instanceof IGerente)) {
             throw new PermissaoNegadaException("o usuário não é um gerente");
         }
-    }
-
-
-    public Automovel buscarAutomovel(String codigo) throws ObjetoNaoEncontradoException {
     }
 }
