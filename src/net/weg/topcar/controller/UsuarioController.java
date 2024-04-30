@@ -10,6 +10,9 @@ import java.util.List;
 public class UsuarioController {
     private UsuarioService usuarioService;
 
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
     public List<Automovel> verMeusAutomoveis() {
         return usuarioService.meusAutomoveis();
     }
@@ -20,7 +23,7 @@ public class UsuarioController {
         }
     }
 
-    public Cliente adicionar(Cliente cliente) throws UsuarioExistenteException {
+    protected Cliente cadastroUsuario(Cliente cliente) throws UsuarioExistenteException {
         if (cliente != null) {
             validaCPF(cliente.getCpf());
             return usuarioService.adicionar(cliente);
@@ -32,27 +35,41 @@ public class UsuarioController {
         return usuarioService.buscarUm(cpf);
     }
 
-    public void alterar(Cliente clienteEditado) throws ObjetoNaoEncontradoException {
-        isGerente();
+    protected void editarUsuario(Cliente clienteEditado) throws ObjetoNaoEncontradoException {
         usuarioService.alterar(clienteEditado);
     }
 
     private Vendedor isVendedor() throws PermissaoNegadaException {
-        if (usuarioLogado instanceof Vendedor vendedor) {
+        if (UsuarioAutenticadoBack.getUsuario() instanceof Vendedor vendedor) {
             return vendedor;
         }
         throw new PermissaoNegadaException("o usuário não é um vendedor");
     }
 
-    private void isGerente() throws PermissaoNegadaException {
-        if (!(usuarioLogado instanceof IGerente)) {
+    protected void isGerente() throws PermissaoNegadaException {
+        if (!(UsuarioAutenticadoBack.getUsuario() instanceof IGerente)) {
             throw new PermissaoNegadaException("o usuário não é um gerente");
         }
     }
 
     public void remover(Long cpf) throws ObjetoNaoEncontradoException {
+        isGerente();
+        usuarioService.remover(cpf);
     }
 
     public void vender(Long cpf, String codigo) throws FalhaNaVendaException {
+        isVendedor();
+        usuarioService.vender(cpf, codigo);
+    }
+
+    public String buscarPagamento(Long cpf) throws ObjetoNaoEncontradoException, TipoDeUsuarioInvalidoException {
+        isGerente();
+        return usuarioService.buscarPagamento(cpf);
+    }
+
+    public String buscarPagamento() throws ObjetoNaoEncontradoException, TipoDeUsuarioInvalidoException {
+        isVendedor();
+        Vendedor vendedor = (Vendedor) UsuarioAutenticadoBack.getUsuario();
+        return usuarioService.buscarPagamento(vendedor.getCpf());
     }
 }

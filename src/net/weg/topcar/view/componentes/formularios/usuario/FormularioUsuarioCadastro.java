@@ -27,7 +27,7 @@ public class FormularioUsuarioCadastro extends FormularioUsuario {
             if (novoCliente == null) {
                 novoCliente = new Cliente(nome, cpf, senha, idade);
             }
-            usuarioController.adicionar(novoCliente);
+            usuarioController.cadastroUsuario(novoCliente);
         } catch (UsuarioExistenteException exception) {
             saida.escreva(exception.getMessage());
         }

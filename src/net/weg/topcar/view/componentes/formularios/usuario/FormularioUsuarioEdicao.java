@@ -22,7 +22,7 @@ public class FormularioUsuarioEdicao extends FormularioUsuario {
                 } else {
                     clienteEditado = new Cliente(nome, cliente.getCpf(), cliente.getSenha(), idade);
                 }
-                usuarioController.alterar(clienteEditado);
+                usuarioController.editarUsuario(clienteEditado);
             }
         } catch (ObjetoNaoEncontradoException | PermissaoNegadaException exception) {
             saida.escrevaL(exception.getMessage());
