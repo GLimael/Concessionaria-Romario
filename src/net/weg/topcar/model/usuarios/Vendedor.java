@@ -8,10 +8,12 @@ import net.weg.topcar.model.exceptions.ObjetoNaoEncontradoException;
 public class Vendedor extends Cliente implements IVendedor {
     private Double salario;
     private Double comissoes;
+    private Double comissao;
 
     public Vendedor(String nome, Long cpf, String senha, Long idade, Double salario) {
         super(nome, cpf, senha, idade);
         this.salario = salario;
+        this.comissao = 0.01;
     }
 
     @Override
@@ -27,6 +29,7 @@ public class Vendedor extends Cliente implements IVendedor {
     public void vender(Automovel automovel, Cliente cliente) throws FalhaNaVendaException {
         if (!automovel.isComprado()) {
             cliente.adicionarProprioAutomovel(automovel);
+            automovel.mudarStatusDeCompra();
             this.comissoes += (automovel.getPreco() * 0.01);
         } else {
             throw new FalhaNaVendaException("o automóvel já foi comprado!");
@@ -55,5 +58,9 @@ public class Vendedor extends Cliente implements IVendedor {
 
     public Double getSalario() {
         return this.salario;
+    }
+
+    public void setComissao (Double comissao) {
+        this.comissao = comissao;
     }
 }

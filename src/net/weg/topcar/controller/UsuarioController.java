@@ -36,7 +36,7 @@ public class UsuarioController {
     }
 
     protected void editarUsuario(Cliente clienteEditado) throws ObjetoNaoEncontradoException {
-        usuarioService.alterar(clienteEditado);
+        usuarioService.alterar(clienteEditado.getCpf(), clienteEditado);
     }
 
     private Vendedor isVendedor() throws PermissaoNegadaException {
@@ -57,9 +57,9 @@ public class UsuarioController {
         usuarioService.remover(cpf);
     }
 
-    public void vender(Long cpf, String codigo) throws FalhaNaVendaException {
+    public void vender(Long cpfCliente, String codigo) throws FalhaNaVendaException, ObjetoNaoEncontradoException {
         isVendedor();
-        usuarioService.vender(cpf, codigo);
+        usuarioService.vender(cpfCliente, codigo);
     }
 
     public String buscarPagamento(Long cpf) throws ObjetoNaoEncontradoException, TipoDeUsuarioInvalidoException {
@@ -71,5 +71,20 @@ public class UsuarioController {
         isVendedor();
         Vendedor vendedor = (Vendedor) UsuarioAutenticadoBack.getUsuario();
         return usuarioService.buscarPagamento(vendedor.getCpf());
+    }
+
+    public List<Vendedor> buscarVendedores() {
+        isGerente();
+        return usuarioService.buscarVendedores();
+    }
+
+    public List<Cliente> buscarUsuarios() {
+        isGerente();
+        return usuarioService.buscarUsuarios();
+    }
+
+    public List<String> buscarPagamentoVendedores() {
+        isGerente();
+        return usuarioService.buscarPagamentoVendedores();
     }
 }
